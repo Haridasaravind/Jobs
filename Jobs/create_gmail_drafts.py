@@ -14,7 +14,7 @@ load_dotenv()
 # =========================
 # 
 MAX_DRAFTS = 10
-CC_EMAIL = "rvindbhi12@gmil.com"
+CC_EMAIL = "tulasi@stemsolllc.com"
 
 # =========================
 # DB CONNECTION 
@@ -140,6 +140,7 @@ for row in rows:
         I recently came across your posting for a
         <b>Java Full Stack Developer</b> role and wanted to
         share my resume for your consideration.
+
     </p>
     <p>
         <b>Visa:</b> H1B<br>
@@ -150,10 +151,9 @@ for row in rows:
         I look forward to hearing from you.
     </p>
     <p>
-        Thanks & Regards,<br>
-        <b>rvind hrids</b><br>
-        +1 (816) 529 0406<br>
-        venkatakrishnaye@gmail.com
+        <br> Regards, </br>
+        <br> Aravind Haridas </br> 
+        <br> ✉️ aravind.har0603@gmail.com | 📞 +1 857-693-9910 </br>
     </p>
     <hr>
     <p>

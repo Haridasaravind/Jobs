@@ -29,8 +29,14 @@ HEADERS = {
     "Accept": "text/html"
 }
 
+# JAVA_KEYWORDS = [   "java", "spring boot","C2C" #]
+
 JAVA_KEYWORDS = [
-    "java", "spring boot","C2C"
+    "java",
+    "java full stack",
+    "full stack java",
+    "spring boot",
+    "java developer"
 ]
 
 EXCLUDED_TITLE_KEYWORDS = [
@@ -142,7 +148,7 @@ def is_valid_java_job(title, jd_text):
     text = f"{title.lower()} {jd_text.lower()}"
     if any(k in title.lower() for k in EXCLUDED_TITLE_KEYWORDS):
         return False
-    return sum(1 for k in JAVA_KEYWORDS if k in text) >= 2
+    return any(k in text for k in JAVA_KEYWORDS)
 
 # =========================
 # FETCH JD
@@ -160,6 +166,37 @@ def fetch_and_parse_jd(url):
         return None, None
 
     return jd_text, email
+
+# =========================
+# Scrpper loop logic for lst 24 hours
+# =========================
+def is_recent_post(posted_text: str) -> bool:
+    """
+    Accepts:
+    - Today
+    - X hours ago
+    - 1 day ago
+    Rejects:
+    - 2+ days ago
+    """
+    if not posted_text:
+        return False
+
+    text = posted_text.lower()
+
+    if "today" in text:
+        return True
+
+    if "hour" in text:
+        return True
+
+    if "day" in text:
+        match = re.search(r"\d+", text)
+        if match:
+            return int(match.group()) <= 1
+
+    return False
+
 
 # =========================
 # SCRAPE SEARCH PAGE
@@ -185,22 +222,38 @@ print(f"\n🟢 TOTAL JOBS FOUND: {total_jobs}\n")
 for row in rows:
     cols = row.find_all("td")
     link = row.find("a")
+
     if not cols or not link:
+        continue
+
+    if len(cols) < 3:
         continue
 
     title = clean_job_title(cols[0].get_text(" ", strip=True))
     location = cols[1].get_text(strip=True)
+
+    posted_text = cols[2].get_text(strip=True)
+
+    # 🔴 FILTER: LAST 24 HOURS ONLY
+    print(f"SKIPPED → {title} | POSTED: {posted_text}")
+    # Temporry fix for the project 
+    # if not is_recent_post(posted_text):
+    #     continue
+
+    # 🔴 QUICK JAVA TITLE FILTER
+    if not any(k in title.lower() for k in JAVA_KEYWORDS):
+        continue
+
     vendor = cols[3].get_text(strip=True) if len(cols) > 3 else "Unknown"
     url = "https://nvoids.com/" + link["href"]
 
     jd_text, email = fetch_and_parse_jd(url)
+
     if not jd_text or not is_valid_java_job(title, jd_text):
         continue
 
-    # ✅ Passed Java filter
     java_filtered += 1
 
-    # ⛔ Duplicate in same run
     if is_duplicate_in_run(email):
         duplicates += 1
         continue
